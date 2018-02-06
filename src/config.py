@@ -55,7 +55,8 @@ SENT_START = '<w>'
 SENT_END = '</w>'
 SENT_PAD = '<PAD>'
 SENT_CONT = '##'
-UNKNOWN = '_UNK'
+##UNKNOWN = '_UNK'
+UNKNOWN = 'unk'
 NUMBER = '####'
 
 if args.embeddings:

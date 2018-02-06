@@ -23,6 +23,14 @@ def read_word_embeddings(fname):
 
     # get dimensions from last word added
     vec_dim = len(word_vec_map[word])
+    #append custom embeddings 
+    toks = ['<w>', '</w>', '<PAD>', '##', '####']
+    mu, sigma = 0, 0.01
+
+    for tok in toks:
+        embedding = np.random.normal(mu, sigma, vec_dim)
+        word_vec_map[tok] = embedding    
+        word_id_map[tok] = len(word_id_map)
     return word_vec_map, word_id_map, vec_dim
 
 def load_character_data(fname, char_to_id, max_sent_len, max_word_len=32):
@@ -89,7 +97,7 @@ def load_word_data(fname, word_to_id, tag_to_id, max_sent_len, is_training=False
 
             #if args.multilingual:
             #    token = langcode + ':' + token
-
+            #	print(token, tag)
             # Some preprocessing
             if token not in splittable and re.match('^[0-9\.\,-]+$', token):
                 curr_X.append(word_to_id[NUMBER])
@@ -104,7 +112,7 @@ def load_word_data(fname, word_to_id, tag_to_id, max_sent_len, is_training=False
             elif is_training and args.mwe and ('~' in token or '-' in token):
                 curr_X.append(attempt_reconstruction(token, word_to_id))
             else:
-                #print("unk*****", token) #if token not in embeddings it's UNK (or mwu if option off)
+                print("unk*****", token) #if token not in embeddings it's UNK (or mwu if option off)
                 curr_X.append(word_to_id[UNKNOWN])
             curr_y.append(tag_to_id[tag])
 

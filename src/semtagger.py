@@ -19,7 +19,7 @@ from keras.layers import LSTM, GRU, Input, merge, BatchNormalization
 from keras.layers.wrappers import TimeDistributed
 from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape, Lambda
 from keras.layers.convolutional import Convolution1D, Convolution2D, MaxPooling1D, MaxPooling2D, AveragePooling2D
-from keras.engine.topology import Merge
+from keras.layers import Merge
 from keras import backend as K
 from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint, ProgbarLogger
 
@@ -465,6 +465,7 @@ if __name__ == '__main__':
         if __debug__: print('Loading embeddings...')
         word_vectors, index_dict, word_embedding_dim = utils.read_word_embeddings(args.embeddings)
         if __debug__: print('Embeddings for {} words loaded'.format(len(word_vectors)))
+      #  print index_dict['####']
     else:
         word_embedding_dim = args.word_embedding_dim   ### TODO: if no embeddings given, no index_dict!
         index_dict = {} # HACK: Empty dict will do for now
