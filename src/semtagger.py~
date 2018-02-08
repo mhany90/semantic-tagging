@@ -76,16 +76,16 @@ def build_model():
 
             #orig_char_embedding = Reshape((args.max_sent_len, args.max_word_len * args.char_embedding_dim))(x)
 
-            bypassed_char_rep = Conv2D(args.max_sent_len, (1, args.char_embedding_dim) , activation='relu', padding='same')(x)
-            bypassed_char_rep = AveragePooling2D(pool_size=(args.max_word_len, 1), padding='same')(bypassed_char_rep)
+            bypassed_char_rep = Conv2D(args.max_sent_len, 1, args.char_embedding_dim, activation='relu', border_mode='same')(x)
+            bypassed_char_rep = AveragePooling2D(pool_size=(args.max_word_len, 1), border_mode='same')(bypassed_char_rep)
 
             bypassed_char_rep = Reshape((args.max_sent_len, args.char_embedding_dim))(bypassed_char_rep)
 
-            #l = GRU(units=int(args.rnn_dim), return_sequences=True, dropout=0.1, recurrent_dropout=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu', consume_less='cpu')(bypassed_char_rep)
-            #l = GRU(units=int(args.rnn_dim/2), return_sequences=True, dropout=0.1, recurrent_dropout=0.1, activation='relu', consume_less='cpu')(l)
+            #l = GRU(output_dim=int(args.rnn_dim), return_sequences=True, dropout_W=0.1, dropout_U=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu', consume_less='cpu')(bypassed_char_rep)
+            #l = GRU(output_dim=int(args.rnn_dim/2), return_sequences=True, dropout_W=0.1, dropout_U=0.1, activation='relu', consume_less='cpu')(l)
 
-            #r = GRU(units=int(args.rnn_dim), return_sequences=True, go_backwards=True, dropout=0.1, recurrent_dropout=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu', consume_less='cpu')(bypassed_char_rep)
-            #r = GRU(units=int(args.rnn_dim/2), return_sequences=True, go_backwards=True, dropout=0.1, recurrent_dropout=0.1, activation='relu', consume_less='cpu')(r)
+            #r = GRU(output_dim=int(args.rnn_dim), return_sequences=True, go_backwards=True, dropout_W=0.1, dropout_U=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu', consume_less='cpu')(bypassed_char_rep)
+            #r = GRU(output_dim=int(args.rnn_dim/2), return_sequences=True, go_backwards=True, dropout_W=0.1, dropout_U=0.1, activation='relu', consume_less='cpu')(r)
 
             #bypassed_char_rep = merge([l, r], mode='concat')
 
@@ -99,19 +99,19 @@ def build_model():
                 if args.dropout:
                     x = Dropout(args.dropout)(x)
 
-                one_x_one = Conv2D(args.max_sent_len, 1, 1, activation='relu', padding='same')(x)
-                one_x_one = MaxPooling2D(pool_size=(2, 2), padding='same')(one_x_one)
+                one_x_one = Conv2D(args.max_sent_len, 1, 1, activation='relu', border_mode='same')(x)
+                one_x_one = MaxPooling2D(pool_size=(2, 2), border_mode='same')(one_x_one)
 
-                three_x_three = Conv2D(int(args.max_sent_len/4), 1, 1, activation='relu', padding='same')(x)
-                three_x_three = Conv2D(args.max_sent_len, 3, 3, activation='relu', padding='same')(three_x_three)
-                three_x_three = MaxPooling2D(pool_size=(2, 2), padding='same')(three_x_three)
+                three_x_three = Conv2D(int(args.max_sent_len/4), 1, 1, activation='relu', border_mode='same')(x)
+                three_x_three = Conv2D(args.max_sent_len, 3, 3, activation='relu', border_mode='same')(three_x_three)
+                three_x_three = MaxPooling2D(pool_size=(2, 2), border_mode='same')(three_x_three)
 
-                five_x_five = Conv2D(int(args.max_sent_len/4), 1, 1, activation='relu', padding='same')(x)
-                five_x_five = Conv2D(args.max_sent_len, 5, 5, activation='relu', padding='same')(five_x_five)
-                five_x_five = MaxPooling2D(pool_size=(2, 2), padding='same')(five_x_five)
+                five_x_five = Conv2D(int(args.max_sent_len/4), 1, 1, activation='relu', border_mode='same')(x)
+                five_x_five = Conv2D(args.max_sent_len, 5, 5, activation='relu', border_mode='same')(five_x_five)
+                five_x_five = MaxPooling2D(pool_size=(2, 2), border_mode='same')(five_x_five)
 
-                max_pool = MaxPooling2D(pool_size=(2, 2), padding='same')(x)
-                max_pool = Conv2D(args.max_sent_len, 1, 1, activation='relu', padding='same')(max_pool) #TODO: Dim red.
+                max_pool = MaxPooling2D(pool_size=(2, 2), border_mode='same')(x)
+                max_pool = Conv2D(args.max_sent_len, 1, 1, activation='relu', border_mode='same')(max_pool) #TODO: Dim red.
 
                 x = merge([one_x_one, three_x_three, five_x_five, max_pool], mode='concat', name='inception_{0}'.format(inc_idx))
 
@@ -133,10 +133,10 @@ def build_model():
                 if args.dropout:
                     x = Dropout(args.dropout)(x)
 
-                x = Conv2D(args.max_sent_len, 5, 5, activation='relu', padding='same')(x)
+                x = Conv2D(args.max_sent_len, 5, 5, activation='relu', border_mode='same')(x)
 
                 # x = Convolution1D(
-                #     conv_dims, kernel_size, padding='same', init='he_normal',
+                #     conv_dims, kernel_size, border_mode='same', init='he_normal',
                 #     W_regularizer=conv_regularizer,
                 #     b_regularizer=conv_regularizer)(x)
 
@@ -147,10 +147,10 @@ def build_model():
                 if args.dropout:
                     x = Dropout(args.dropout)(x)
 
-                x = Conv2D(args.max_sent_len, 5, 5, activation='relu', padding='same')(x)
+                x = Conv2D(args.max_sent_len, 5, 5, activation='relu', border_mode='same')(x)
 
                 # x = Convolution1D(
-                #     conv_dims, kernel_size, padding='same', init='he_normal',
+                #     conv_dims, kernel_size, border_mode='same', init='he_normal',
                 #     W_regularizer=conv_regularizer,
                 #     b_regularizer=conv_regularizer)(x)
 
@@ -168,20 +168,20 @@ def build_model():
 
         else:
 
-            x = Conv2D(args.max_sent_len,kernel_size=(4, 8), activation='relu', padding='same', data_format ='channels_first')(x)
+            x = Conv2D(args.max_sent_len, 4, 8, activation='relu', border_mode='same')(x)
             print(x.shape)
-            x = MaxPooling2D(pool_size=(2, 2), padding='same', data_format ='channels_first')(x)
+            x = MaxPooling2D(pool_size=(2, 2), border_mode='same')(x)
             print(x.shape)
-            x = Conv2D(args.max_sent_len,kernel_size=(4, 4), activation='relu', padding='same', data_format ='channels_first')(x)
+            x = Conv2D(args.max_sent_len, 4, 4, activation='relu', border_mode='same')(x)
             print(x.shape)      
-            x = MaxPooling2D(pool_size=(2, 2), padding='same', data_format ='channels_first')(x)
-            #avg_p = AveragePooling2D(pool_size=(maxlen_word, 2), padding='same')(x)
+            x = MaxPooling2D(pool_size=(2, 2), border_mode='same')(x)
+            #avg_p = AveragePooling2D(pool_size=(maxlen_word, 2), border_mode='same')(x)
             print(x.shape)
             #channels = merge([max_p, avg_p], mode='concat')
 
             feature_size = int(args.max_word_len / 4) * int(args.char_embedding_dim / 4)
-            print(args.max_sent_len, feature_size, x.shape)
-            char_embedding = Reshape((args.max_sent_len, feature_size))(x)
+            print(feature_size, x.shape)
+            char_embedding = Reshape((args.max_sent_len, int(feature_size)))(x)
 
     if args.words:
         word_input = Input(shape=(args.max_sent_len, ), dtype='int32', name='word_input')
@@ -203,11 +203,11 @@ def build_model():
 
     if args.rnn:
         # Bidirectional GRU
-        l = GRU(units=int(args.rnn_dim), return_sequences=True, dropout=0.1, recurrent_dropout=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu')(embedding)
-        l = GRU(units=int(args.rnn_dim/2), return_sequences=True, dropout=0.1, recurrent_dropout=0.1, activation='relu')(l)
+        l = GRU(output_dim=int(args.rnn_dim), return_sequences=True, dropout_W=0.1, dropout_U=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu', consume_less='cpu')(embedding)
+        l = GRU(output_dim=int(args.rnn_dim/2), return_sequences=True, dropout_W=0.1, dropout_U=0.1, activation='relu', consume_less='cpu')(l)
 
-        r = GRU(units=int(args.rnn_dim), return_sequences=True, go_backwards=True, dropout=0.1, recurrent_dropout=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu')(embedding)
-        r = GRU(units=int(args.rnn_dim/2), return_sequences=True, go_backwards=True, dropout=0.1, recurrent_dropout=0.1, activation='relu')(r)
+        r = GRU(output_dim=int(args.rnn_dim), return_sequences=True, go_backwards=True, dropout_W=0.1, dropout_U=0.1, input_shape=(args.max_sent_len, word_embedding_dim), activation='relu', consume_less='cpu')(embedding)
+        r = GRU(output_dim=int(args.rnn_dim/2), return_sequences=True, go_backwards=True, dropout_W=0.1, dropout_U=0.1, activation='relu', consume_less='cpu')(r)
 
         x = merge([l, r], mode='concat')
         if args.bn:
@@ -246,7 +246,7 @@ def build_model():
         stag_output = TimeDistributed(Dense(nb_stag_classes, activation='softmax', name='stag_output'))(x)
         model_output = [main_output, stag_output]
 
-    model = Model(inputs=model_input, outputs=model_output)
+    model = Model(input=model_input, output=model_output)
 
     return model
 
@@ -649,7 +649,7 @@ if __name__ == '__main__':
     else:
         model.fit(X_train, y_train,
                       validation_data=(X_dev, y_dev),
-                      epochs=args.epochs,
+                      nb_epoch=args.epochs,
                       batch_size=args.bsize,
                       callbacks=callbacks,
                       verbose=args.verbose)

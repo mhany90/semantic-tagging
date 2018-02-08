@@ -138,7 +138,7 @@ def read_char_data(trainfile, devfile, testfile, char_to_id, max_sent_len, max_w
     print("preprocess chars")
     X_train = preprocess_chars(X_train_ids, char_to_id, max_sent_len, max_word_len)
     X_dev = preprocess_chars(X_dev_ids, char_to_id, max_sent_len, max_word_len)
-
+    print(X_train.shape)
     return X_train, X_dev, X_test
 
 def preprocess_chars(X_ids, char_to_id, max_sent_len, max_word_len):
