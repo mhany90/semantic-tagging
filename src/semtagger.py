@@ -66,8 +66,12 @@ def build_model():
 
     if args.chars:
         char_input = Input(shape=(args.max_sent_len, args.max_word_len), dtype='int32', name='char_input')
+        print(char_input)
 
         x = Reshape((args.max_sent_len*args.max_word_len, ))(char_input)
+        print(x.shape)
+        print(args.max_sent_len*args.max_word_len)
+        
         x = Embedding(char_vocab_size, args.char_embedding_dim, input_length=args.max_sent_len*args.max_word_len)(x)
         x = Reshape((args.max_sent_len, args.max_word_len, args.char_embedding_dim))(x)
         print(x.shape)
@@ -76,8 +80,8 @@ def build_model():
 
             #orig_char_embedding = Reshape((args.max_sent_len, args.max_word_len * args.char_embedding_dim))(x)
 
-            bypassed_char_rep = Conv2D(args.max_sent_len, (1, args.char_embedding_dim) , activation='relu', padding='same')(x)
-            bypassed_char_rep = AveragePooling2D(pool_size=(args.max_word_len, 1), padding='same')(bypassed_char_rep)
+            bypassed_char_rep = Conv2D(args.max_sent_len, (1, args.char_embedding_dim) , activation='relu', padding='same', data_format ='channels_first')(x)
+            bypassed_char_rep = AveragePooling2D(pool_size=(args.max_word_len, 1), padding='same', data_format ='channels_first')(bypassed_char_rep)
 
             bypassed_char_rep = Reshape((args.max_sent_len, args.char_embedding_dim))(bypassed_char_rep)
 
@@ -133,7 +137,7 @@ def build_model():
                 if args.dropout:
                     x = Dropout(args.dropout)(x)
 
-                x = Conv2D(args.max_sent_len, 5, 5, activation='relu', padding='same')(x)
+                x = Conv2D(args.max_sent_len, kernel_size=(5, 5), activation='relu', padding='same', data_format ='channels_first')(x)
 
                 # x = Convolution1D(
                 #     conv_dims, kernel_size, padding='same', init='he_normal',
@@ -147,7 +151,7 @@ def build_model():
                 if args.dropout:
                     x = Dropout(args.dropout)(x)
 
-                x = Conv2D(args.max_sent_len, 5, 5, activation='relu', padding='same')(x)
+                x = Conv2D(args.max_sent_len,kernel_size=(5, 5), activation='relu', padding='same', data_format ='channels_first')(x)
 
                 # x = Convolution1D(
                 #     conv_dims, kernel_size, padding='same', init='he_normal',
@@ -483,7 +487,7 @@ if __name__ == '__main__':
     # Word data must be read even if word features aren't used
     (X_train_words, y_train), (X_dev_words, y_dev), (X_test_words, y_test), word_vectors = data_utils.read_word_data(args.train[0], args.dev[0], args.test[0], index_dict, word_vectors, args.max_sent_len)
     nb_classes = y_train.shape[2]
-
+    
     if len(args.train) == 2:
         (X_train_words_stag, y_train_stag), (X_dev_words_stag, y_dev_stag), (X_test_words_stag, y_test_stag), word_vectors = data_utils.read_word_data(args.train[1], args.dev[1], args.test[1], index_dict, word_vectors, args.max_sent_len)
         nb_stag_classes = y_train_stag.shape[2]
@@ -514,12 +518,13 @@ if __name__ == '__main__':
         if __debug__: print('Loading char features...')
 
         char_to_id = defaultdict(lambda: len(char_to_id))
-        char_to_id['tst']
+        #char_to_id['tst']
         for dummy_char in (UNKNOWN, SENT_START, SENT_END, SENT_PAD):
             char_to_id[dummy_char]
 
         #X_train_chars, X_dev_chars, X_test_chars = read_data(data_utils.read_char_data, char_to_id, None, args.max_sent_len, args.max_word_len)
         X_train_chars, X_dev_chars, X_test_chars = data_utils.read_char_data(args.train[0], args.dev[0], args.test[0], char_to_id, args.max_sent_len, args.max_word_len)
+
         if len(args.train) == 2:
             X_train_chars_stag, X_dev_chars_stag, X_test_chars_stag = data_utils.read_char_data(args.train[1], args.dev[1], args.test[1], char_to_id, args.max_sent_len, args.max_word_len)
 
@@ -534,7 +539,7 @@ if __name__ == '__main__':
             print('x_dev chars  : ({0: <6}, {1: <3})'.format(X_dev_chars[0].shape[0], X_dev_chars[0].shape[1]))
             if args.test:
                 print('x_test chars : ({0: <6}, {1: <3}'.format(X_test_chars[0].shape[0], X_test_chars[0].shape[1]))
-
+            print(char_to_id)
     if __debug__: print('Building model...')
 
     if len(args.train) == 2:
@@ -632,8 +637,8 @@ if __name__ == '__main__':
             for batch in range(n_batches):
                 curr_batch_idx = np.arange(args.bsize * batch, args.bsize * (batch+1))
                 model.train_on_batch([X_train[0][curr_batch_idx], ], y_train[curr_batch_idx])
-
             print('validating')
+
             dev_loss = [0, 0, 0]
             for batch in range(n_dev_batches):
                 curr_batch_idx = np.arange(args.bsize * batch, args.bsize * (batch+1))
@@ -646,7 +651,13 @@ if __name__ == '__main__':
             dev_loss /= n_dev_batches
             print('loss: {0}, auto-acc: {1}, real acc: {2}'.format(*dev_loss))
 
+   
     else:
+        #print(X_train[1][17])
+        #print(X_train[1][42])
+        #print(X_train[1][43])
+      
+
         model.fit(X_train, y_train,
                       validation_data=(X_dev, y_dev),
                       epochs=args.epochs,

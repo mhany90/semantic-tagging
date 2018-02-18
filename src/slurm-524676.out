@@ -1,0 +1,48 @@
+2018-02-13 11:39:04.058457: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+Using TensorFlow backend.
+semtagger.py:193: UserWarning: The `dropout` argument is no longer support in `Embedding`. You can apply a `keras.layers.SpatialDropout1D` layer right after the `Embedding` layer to get the same behavior.
+  word_embedding = Embedding(vocab_size, word_embedding_dim, input_length=args.max_sent_len, dropout=0.1, weights=[embedding_weights], trainable=(args.freeze))(word_input)
+semtagger.py:198: UserWarning: The `merge` function is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  embedding = merge([word_embedding, char_embedding], mode='concat')
+/home/s3094723/miniconda3/envs/SEMCPU/lib/python3.5/site-packages/keras/legacy/layers.py:458: UserWarning: The `Merge` layer is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  name=name)
+semtagger.py:216: UserWarning: The `merge` function is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  x = merge([l, r], mode='concat')
+
+
+###############################################################################
+Peregrine Cluster
+Job 524676 for user 's3094723'
+Finished at: Wed Feb 14 00:16:18 CET 2018
+
+Job details:
+============
+
+Name                : run.sh
+User                : s3094723
+Partition           : regular
+Nodes               : pg-node008
+Cores               : 1
+State               : COMPLETED
+Submit              : 2018-02-13T11:33:09
+Start               : 2018-02-13T11:33:09
+End                 : 2018-02-14T00:16:17
+Reserved walltime   : 4-04:15:00
+Used walltime       :   12:43:08
+Used CPU time       :   12:41:47 (efficiency: 99.82%)
+% User (Computation): 98.89%
+% System (I/O)      :  1.11%
+Mem reserved        : 32G/node
+Max Mem used        : 13.26G (pg-node008)
+Max Disk Write      : 358.40K (pg-node008)
+Max Disk Read       : 15.81M (pg-node008)
+
+
+Acknowledgements:
+=================
+
+Please see this page if you want to acknowledge Peregrine in your publications:
+
+https://redmine.hpc.rug.nl/redmine/projects/peregrine/wiki/ScientificOutput
+
+################################################################################

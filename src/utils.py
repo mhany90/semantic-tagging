@@ -24,7 +24,7 @@ def read_word_embeddings(fname):
     # get dimensions from last word added
     vec_dim = len(word_vec_map[word])
     #append custom embeddings 
-    toks = ['<w>', '</w>', '<PAD>', '##', '####']
+    toks = ['<w>', '</w>', '<PAD>', '##', '####', '_UNK']
     mu, sigma = 0, 0.01
 
     for tok in toks:
@@ -39,19 +39,25 @@ def load_character_data(fname, char_to_id, max_sent_len, max_word_len=32):
     ## first load all (except cut on word length
     with open(fname, 'r', encoding='utf-8') as in_f:
         curr_X = []
-        for line in in_f:
+        count = 0
+        for id, line in enumerate(in_f):
             line = line.strip()
             if not line:
+                count = count + 1
                 if curr_X:
                     X.append(curr_X)
                     curr_X = []
                 continue
 
-            token = line.split('\t')[0]
+            token = line.split('\t')[0].strip()
+            if count == 366:
+                print(token)
             #if len(token) > max_word_len:
             #    char_ids = [char_to_id[UNKNOWN]] #todo: keep <max info
             #else:
+            new = []
             char_ids = [char_to_id[char] for char in token]
+  
             curr_X.append(char_ids)
 
             if args.shorten_sents and len(curr_X) >= max_sent_len-2:
@@ -63,7 +69,8 @@ def load_character_data(fname, char_to_id, max_sent_len, max_word_len=32):
     # Final sent
     if curr_X:
         X.append(curr_X)
-
+   
+    print(count)
     # cutoff for max_sent_len
     X = [s[:max_sent_len] for s in X]
     return X
@@ -92,9 +99,8 @@ def load_word_data(fname, word_to_id, tag_to_id, max_sent_len, is_training=False
                     curr_y = []
 
                 continue
-
             token, tag = line.strip().split('\t')
-
+            
             #if args.multilingual:
             #    token = langcode + ':' + token
             #	print(token, tag)

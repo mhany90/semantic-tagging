@@ -138,21 +138,22 @@ def read_char_data(trainfile, devfile, testfile, char_to_id, max_sent_len, max_w
     print("preprocess chars")
     X_train = preprocess_chars(X_train_ids, char_to_id, max_sent_len, max_word_len)
     X_dev = preprocess_chars(X_dev_ids, char_to_id, max_sent_len, max_word_len)
-    print(X_train.shape)
+    print(X_train[365][12])
     return X_train, X_dev, X_test
 
 def preprocess_chars(X_ids, char_to_id, max_sent_len, max_word_len):
     X = []
     for idx, sentence in enumerate(X_ids):
         curr_X = [[char_to_id[SENT_START]]] # Begin with padding
-        #if __debug__ and len(sentence) >= max_sent_len:
+       # if __debug__ and len(sentence) >= max_sent_len:
         #    print("Too long sentence: {0} ?".format(len(sentence)))
         for idy, word in enumerate(sentence[:max_sent_len-2]): #-2 for maxlen+pad
             # Handle too long words
-            if len(word) > max_word_len - 2:
-                quarter = int(max_word_len/4) - 1
-                word = word[:quarter] + word[-quarter:]
-
+            #if len(word) > max_word_len - 2:
+            #    quarter = int(max_word_len/4) - 1
+            #    word = word[:quarter] #+ word[-quarter:]
+                
+            
             curr_word = np.zeros((len(word)+2, ), dtype=np.int8) # +2 for word_start, word_end
             curr_word[0] = char_to_id[SENT_START]
             for idz, char_id in enumerate(word):
@@ -168,4 +169,7 @@ def preprocess_chars(X_ids, char_to_id, max_sent_len, max_word_len):
         X.append(padded)
 
     X = np.asarray(X, dtype=np.int8)
+    X[X < 0] = 0
+  #  print(X.shape)
+    print(X[X<0])
     return X
